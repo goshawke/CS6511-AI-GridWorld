@@ -1,7 +1,5 @@
 from matplotlib import pyplot
 import os
-import random
-import time
 
 def update_grid(data, good_term_states, bad_term_states, obstacles, run_num, epoch, world, location, verbose):
     pyplot.figure(1)

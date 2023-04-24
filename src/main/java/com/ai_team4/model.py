@@ -1,11 +1,7 @@
 import numpy as np
-import api
 import Requests
-import random
 import movement_viz as v
 from matplotlib import pyplot
-
-import utils
 
 def init_q_table():
     '''
@@ -55,11 +51,11 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
     ~MAIN LEARNING FUNCTION~
     takes in:
     -the Q-table data structure (numpy 3-dimensional array)
-    -worldID (for api and plotting)
+    -worldId (for api and plotting)
     -mode (train or exploit)
     -learning rate (affects q-table calculation)
     -gamma (weighting of the rewards)
-    -epsilon (determines the amount of random exploration the agen does)
+    -epsilon (determines the amount of random exploration the agent does)
     -good_term_states
     -bad_term_states
     -eposh
@@ -67,17 +63,11 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
     -verbosity
 
     returns: q_table [NumPy Array], good_term_states [list], bad_term_states [list], obstacles [list]
-
-
     '''
 
     #create the api instance
     a = Requests.Requests(worldId=worldId)
-    w_res = a.enter_world()
-
-
-    # if verbose: print("w_res: ",w_res)
-
+    a.enter_world()
 
     #init terminal state reached
     terminal_state = False
@@ -106,7 +96,6 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
     #keep track of where we've been for the visualization
     visited.append(location)
     while True:
-        #////////////////// CODE FOR VISUALIZATION
         curr_board[location[1]][location[0]] = 1
         for i in range (len(curr_board)):
             for j in range(len(curr_board)):
@@ -116,7 +105,6 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
             if obstacle in visited:
                 obstacles.remove(obstacle)
         v.update_grid(curr_board, good_term_states, bad_term_states, obstacles, run_num, epoch, worldId, location, verbose)
-        #//////////////// END CODE FOR VISUALIZATION
 
         #in q-table, get index of best option for movement based on our current state in the world
         if mode == 'train':
@@ -126,9 +114,9 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
                 explored = np.where(q_table[location[0]][location[1]].astype(int) != 0)[0]
 
                 if unexplored.size != 0:
-                    move_num = int( np.random.choice( unexplored ) )
+                    move_num = int(np.random.choice(unexplored))
                 else:
-                    move_num = int( np.random.choice( explored ) )
+                    move_num = int(np.random.choice(explored))
             else:
                 move_num = np.argmax(q_table[location[0]][location[1]])
 
@@ -140,7 +128,6 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
         move_response = a.make_move(move=num_to_move(move_num), worldId=str(worldId)) 
 
         if verbose: print("move_response", move_response)
-        #OK response looks like {"code":"OK","worldId":0,"runId":"931","reward":-0.1000000000,"scoreIncrement":-0.0800000000,"newState":{"x":"0","y":3}}
         
 
         if move_response["code"] != "OK":
@@ -158,14 +145,10 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
         
         # check that we're not in a terminal state, and if not convert new location JSON into tuple
         if move_response["newState"] is not None:
-            #we're now in new_loc, which will be a tuple of where we are according to the API
-            #KEEP IN MIND the movment of our agent is apparently STOCHASTIC
             new_loc = int(move_response["newState"]["x"]), int(move_response["newState"]["y"]) #tuple (x,y)
             
             # keep track of if we hit any obstacles
             expected_loc = list(location)
-
-            #convert the move we tried to make into an expected location where we think we'll end up (expected_loc) 
             recent_move = num_to_move(move_num)
       
             if recent_move == "N":
@@ -176,9 +159,6 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
                 expected_loc[0]+=1
             elif recent_move == "W":
                 expected_loc[0]-=1
-
-
-
 
             expected_loc = tuple(expected_loc)
 
@@ -195,7 +175,6 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
             for obstacle in obstacles:
                 if obstacle in visited:
                     obstacles.remove(obstacle)
-            
             
         else:
             #we hit a terminal state
@@ -236,13 +215,6 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
             #update our visualization a last time before moving onto the next epoch
             v.update_grid(curr_board, good_term_states, bad_term_states, obstacles, run_num, epoch, worldId, location, verbose)
             break
-
-    #possibly not needed but this seperates out the plot
-    pyplot.figure(2, figsize=(5,5))
-    #cumulative average for plotting reward by step over time purposes
-    cumulative_average = np.cumsum(rewards_acquired) / (np.arange(len(rewards_acquired)) + 1)
-    # plot reward over each step of the agent
-    utils.plot_learning(worldId, epoch, cumulative_average, run_num)
 
     return q_table, good_term_states, bad_term_states, obstacles
 
