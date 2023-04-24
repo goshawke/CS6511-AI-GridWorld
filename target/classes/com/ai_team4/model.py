@@ -8,7 +8,7 @@ def init_q_table():
     init q table (initilizations are all [0])
     defines grid as 40x40, 4 possible actions (N, S, E, W)
     access grid as row, col, action
-    ex of indexing: q-tab[0][0][0] gird 0:0, action 'N'
+    ex of indexing: q-tab[0][0][0] grid 0:0, action 'N'
     '''
 
     return (np.zeros((40, 40, 4)))

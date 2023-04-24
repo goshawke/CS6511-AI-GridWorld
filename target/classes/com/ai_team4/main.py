@@ -4,7 +4,7 @@ import os
 
 def main():
 
-	mode = str(input("\noption 't' is train (default)\noption 'c' is train-cycle\noption 'e' is exploit\n\nENTER OPTION: ") or "t")
+	mode = str(input("\noption 't' is train (default)\noption 'e' is exploit\n\nENTER OPTION: ") or "t")
 
 	if mode == "t":
 
@@ -22,24 +22,17 @@ def main():
 			v = False
 
 		epsilon = 0.9
-
-
 		q_table = model.init_q_table()
 
 		if not (os.path.exists(f"./runs/world_{world}/")):
 			os.makedirs(f"./runs/world_{world}/")
 
 		run_num = len([i for i in os.listdir(f"runs/world_{world}")])
-
-
-
 		file_path = f"./runs/Q-table_world_{world}"
-
 
 		good_term_states = []
 		bad_term_states = []
 		obstacles = []
-
 
 		for epoch in range(epochs):
 			print("EPOCH #"+str(epoch)+":\n\n")
@@ -97,9 +90,7 @@ def epsilon_decay(epsilon, epoch, epochs):
     acroccs the total number of epochs we train on
     this leads us to explore less as we progress through epochs 
     '''
-    
     epsilon = epsilon*np.exp(-.01*epoch)
-    
     print(f"\nNEW EPSILON: {epsilon}\n")
     return epsilon
 
