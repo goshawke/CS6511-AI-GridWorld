@@ -1,5 +1,6 @@
 import numpy as np
 import api
+import Requests
 import random
 import movement_viz as v
 from matplotlib import pyplot
@@ -71,11 +72,11 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
     '''
 
     #create the api instance
-    a = api.API(worldId=worldId)
+    a = Requests.Requests(worldId=worldId)
     w_res = a.enter_world()
 
 
-    if verbose: print("w_res: ",w_res)
+    # if verbose: print("w_res: ",w_res)
 
 
     #init terminal state reached
@@ -88,20 +89,15 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
     rewards_acquired = []
 
     #find out where we are
-    loc_response = a.locate_me()
+    loc_world, loc_state = a.get_location()
 
     #create a list of everywhere we've been for the viz
     visited = []
 
-    if verbose: print("loc_response",loc_response)
-    
-    #OK response looks like {"code":"OK","world":"0","state":"0:2"}
-    if loc_response["code"] != "OK":
-            print(f"something broke on locate_me call \nresponse lookes like: {loc_response}")
-            return -1
+    # if verbose: print("loc_response",loc_response)
     
     # convert JSON into a tuple (x,y)
-    location = int(loc_response["state"].split(':')[0]), int(loc_response["state"].split(':')[1]) #location is a tuple (x, y)
+    location = int(loc_state.split(':')[0]), int(loc_state.split(':')[1]) #location is a tuple (x, y)
     
     # SET UP FIGURE FOR VISUALIZATION.
     pyplot.figure(1, figsize=(10,10))

@@ -1,5 +1,6 @@
 import model
 from api import API
+from Requests import Requests
 import numpy as np
 import os
 import utils
@@ -9,9 +10,9 @@ from tqdm import trange
 
 def main():
 
-	if not (os.path.exists(f"./api_key/key.json")):
-		print("\n\n..oops you need a JSON file called 'key.json' inside the path './api_key/'\n(see the README.md to find out how to structure it)\n\n")
-		exit()
+	# if not (os.path.exists(f"./api_key/key.json")):
+	# 	print("\n\n..oops you need a JSON file called 'key.json' inside the path './api_key/'\n(see the README.md to find out how to structure it)\n\n")
+	# 	exit()
 
 	print("\n\nQ-Learning for the greater good.. choose how to interact with the API:\n")
 
