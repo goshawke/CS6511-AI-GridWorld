@@ -5,10 +5,9 @@ from matplotlib import pyplot
 
 def init_q_table():
     '''
-    init q table (initilizations are all [0])
-    defines grid as 40x40, 4 possible actions (N, S, E, W)
-    access grid as row, col, action
-    ex of indexing: q-tab[0][0][0] grid 0:0, action 'N'
+    initialization of q table
+    we define a grid as 40x40, 4 possible actions (N, S, E, W)
+    an example would be qtable[][][] where we have row column and action
     '''
 
     return (np.zeros((40, 40, 4)))
@@ -33,37 +32,20 @@ def num_to_move(num):
 
 def update_q_table(location, q_table, reward, gamma, new_loc, learning_rate, move_num):
     '''
-    bellman eq: NEW Q(s,a) = Q(s,a) + learning_rate * [R(s,a) + gamma * maxQ'(s',a') - Q(s,a)]
+    Our equation is Q(s,a) = Q(s,a) + learning_rate * [R(s,a) + gamma * maxQ'(s',a') - Q(s,a)]
     '''
 
-    #collecting the current understanding of the best q value based upon our new location, weight it by gamma and add reward
+    # collecting the current understanding of the best q value based upon our new location, weight it by gamma and add reward
     right_side = reward + gamma * q_table[new_loc[0], new_loc[1], :].max() - q_table[location[0], location[1], move_num]
 
-    #use the previous location to 
+    # use the previous location to 
     new_q = q_table[location[0], location[1], move_num] + learning_rate * right_side
 
-    #update q_table with new value
+    # update q_table with new value
     q_table[location[0], location[1], move_num] = new_q
 
 
 def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsilon=0.9, good_term_states=[], bad_term_states=[], epoch=0, obstacles=[], run_num=0, verbose=True):
-    '''
-    ~MAIN LEARNING FUNCTION~
-    takes in:
-    -the Q-table data structure (numpy 3-dimensional array)
-    -worldId (for api and plotting)
-    -mode (train or exploit)
-    -learning rate (affects q-table calculation)
-    -gamma (weighting of the rewards)
-    -epsilon (determines the amount of random exploration the agent does)
-    -good_term_states
-    -bad_term_states
-    -eposh
-    -run number
-    -verbosity
-
-    returns: q_table [NumPy Array], good_term_states [list], bad_term_states [list], obstacles [list]
-    '''
 
     #create the api instance
     a = Requests.Requests(worldId=worldId)
@@ -83,8 +65,6 @@ def learn(q_table, worldId=0, mode='train', learning_rate=0.001, gamma=0.9, epsi
 
     #create a list of everywhere we've been for the viz
     visited = []
-
-    # if verbose: print("loc_response",loc_response)
     
     # convert JSON into a tuple (x,y)
     location = int(loc_state.split(':')[0]), int(loc_state.split(':')[1]) #location is a tuple (x, y)
